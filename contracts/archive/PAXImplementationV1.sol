@@ -1,8 +1,38 @@
 pragma solidity ^0.4.24;
+
+// File: contracts/zeppelin/SafeMath.sol
+
+/**
+ * @title SafeMath
+ * @dev Math operations with safety checks that throw on error
+ */
 pragma experimental "v0.5.0";
+library SafeMath {
+    /**
+    * @dev Subtracts two numbers, reverts on overflow (i.e. if subtrahend is greater than minuend).
+    */
+    function sub(uint256 a, uint256 b) internal pure returns (uint256) {
+        require(b <= a);
+        uint256 c = a - b;
+
+        return c;
+    }
+
+    /**
+    * @dev Adds two numbers, reverts on overflow.
+    */
+    function add(uint256 a, uint256 b) internal pure returns (uint256) {
+        uint256 c = a + b;
+        require(c >= a);
+
+        return c;
+    }
+}
+
+// File: contracts/PAXImplementation.sol
 
 
-import "./zeppelin/SafeMath.sol";
+
 
 
 /**
@@ -370,6 +400,9 @@ contract PAXImplementation {
      */
     function decreaseSupply(uint256 _value) public onlySupplyController returns (bool success) {
         require(_value <= balances[supplyController], "not enough supply");
+        // no need to require value <= totalSupply, since that would imply the
+        // sender's balance is greater than the totalSupply, which *should* be an assertion failure
+
         balances[supplyController] = balances[supplyController].sub(_value);
         totalSupply_ = totalSupply_.sub(_value);
         emit SupplyDecreased(supplyController, _value);

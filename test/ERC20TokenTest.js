@@ -1,19 +1,19 @@
-const PAXMock = artifacts.require('./mocks/PAXWithBalance.sol');
-const Proxy = artifacts.require('../contracts/zeppelin/AdminUpgradeabilityProxy.sol');
+const USDPMock = artifacts.require('USDPWithBalance.sol');
+const Proxy = artifacts.require('AdminUpgradeabilityProxy.sol');
 
 const assertRevert = require('./helpers/assertRevert');
+const {ZERO_ADDRESS} = require('@openzeppelin/test-helpers').constants;
 
-// Test that PAX operates correctly as an ERC20 token.
-contract('ERC20 PAX', function([_, admin, recipient, anotherAccount, owner]) {
-  const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
+// Test that USDP operates correctly as an ERC20 token.
+contract('ERC20 USDP', function ([_, admin, recipient, anotherAccount, owner]) {
 
   beforeEach(async function () {
-    const pax = await PAXMock.new({from: owner});
-    const proxy = await Proxy.new(pax.address, {from: admin});
-    const proxiedPAX = await PAXMock.at(proxy.address);
-    await proxiedPAX.initialize({from: owner});
-    await proxiedPAX.initializeBalance(owner, 100);
-    this.token = proxiedPAX;
+    const usdp = await USDPMock.new({from: owner});
+    const proxy = await Proxy.new(usdp.address, {from: admin});
+    const proxiedUSDP = await USDPMock.at(proxy.address);
+    await proxiedUSDP.initialize({from: owner});
+    await proxiedUSDP.initializeBalance(owner, 100);
+    this.token = proxiedUSDP;
   });
 
   describe('approve', function () {
@@ -30,7 +30,7 @@ contract('ERC20 PAX', function([_, admin, recipient, anotherAccount, owner]) {
           assert.equal(logs[0].event, 'Approval');
           assert.equal(logs[0].args.owner, owner);
           assert.equal(logs[0].args.spender, spender);
-          assert(logs[0].args.value.eq(amount));
+          assert(logs[0].args.value.eqn(amount));
         });
 
         describe('when there was no approved amount before', function () {
@@ -66,7 +66,7 @@ contract('ERC20 PAX', function([_, admin, recipient, anotherAccount, owner]) {
           assert.equal(logs[0].event, 'Approval');
           assert.equal(logs[0].args.owner, owner);
           assert.equal(logs[0].args.spender, spender);
-          assert(logs[0].args.value.eq(amount));
+          assert(logs[0].args.value.eqn(amount));
         });
 
         describe('when there was no approved amount before', function () {
@@ -110,7 +110,7 @@ contract('ERC20 PAX', function([_, admin, recipient, anotherAccount, owner]) {
         assert.equal(logs[0].event, 'Approval');
         assert.equal(logs[0].args.owner, owner);
         assert.equal(logs[0].args.spender, spender);
-        assert(logs[0].args.value.eq(amount));
+        assert(logs[0].args.value.eqn(amount));
       });
     });
   });
@@ -143,7 +143,7 @@ contract('ERC20 PAX', function([_, admin, recipient, anotherAccount, owner]) {
             await this.token.transferFrom(owner, to, amount, {from: spender});
 
             const allowance = await this.token.allowance(owner, spender);
-            assert(allowance.eq(0));
+            assert(allowance.eqn(0));
           });
 
           it('emits a transfer event', async function () {
@@ -153,7 +153,7 @@ contract('ERC20 PAX', function([_, admin, recipient, anotherAccount, owner]) {
             assert.equal(logs[0].event, 'Transfer');
             assert.equal(logs[0].args.from, owner);
             assert.equal(logs[0].args.to, to);
-            assert(logs[0].args.value.eq(amount));
+            assert(logs[0].args.value.eqn(amount));
           });
         });
 
